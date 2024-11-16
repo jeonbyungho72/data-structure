@@ -35,9 +35,27 @@ public class LinearLinkedList<T> {
 
     private Node<T> root;
     private int size = 0;
+    private boolean changeSize;
 
     public int getSize() {
-        return size;
+        if (!this.changeSize) {
+            return this.size;
+        }
+
+        int size = 0;
+        Node<T> countNode = this.root;
+
+        if (countNode == null)
+            return 0;
+
+        while (countNode.getNext() != null) {
+            countNode = countNode.getNext();
+            size++;
+        }
+
+        this.size = size;
+        changeSize = false;
+        return this.size;
     }
 
     public void insert(T data) {
@@ -50,7 +68,7 @@ public class LinearLinkedList<T> {
             return;
         }
 
-        for (int i = 1; i < this.size; i++)
+        while (currentNode.getNext() != null)
             currentNode = currentNode.getNext();
         currentNode.setNext(newNode);
         size++;
@@ -59,13 +77,13 @@ public class LinearLinkedList<T> {
     public void insert(T data, int index) {
         Node<T> prevNode = this.root;
         Node<T> newNode = new Node<T>(data);
-        if (prevNode == null || index > this.size - 1)
+        if (prevNode == null || index > getSize() - 1)
             throw new RuntimeException();
 
         if (index == 0) {
             newNode.setNext(prevNode);
             this.root = newNode;
-            size++;
+            changeSize = true;
             return;
         }
 
@@ -74,13 +92,14 @@ public class LinearLinkedList<T> {
 
         newNode.setNext(prevNode.getNext());
         prevNode.setNext(newNode);
-        size++;
+        changeSize = true;
+
     }
 
     public T get(int index) {
         Node<T> searchNode = this.root;
 
-        if (searchNode == null || index > this.size - 1)
+        if (searchNode == null || index > getSize() - 1)
             return null;
 
         for (int i = 0; i < index; i++)
@@ -130,12 +149,12 @@ public class LinearLinkedList<T> {
     public void remove(int index) {
         Node<T> prevNode = this.root;
 
-        if (prevNode == null || index > this.size - 1)
+        if (prevNode == null || index > getSize() - 1)
             throw new RuntimeException();
 
         if (index == 0) {
             this.root = prevNode.getNext();
-            this.size--;
+            changeSize = true;
             return;
         }
 
@@ -144,15 +163,15 @@ public class LinearLinkedList<T> {
 
         Node<T> beyondNode = prevNode.getNext().getNext();
         prevNode.setNext(beyondNode);
-        this.size--;
+        changeSize = true;
     }
 
     public void remove() {
-        remove(this.size - 1);
+        remove(getSize() - 1);
     }
 
     public void clear() {
         this.root = null;
-        this.size = 0;
+        this.changeSize = true;
     }
 }
